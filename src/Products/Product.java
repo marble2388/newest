@@ -4,7 +4,7 @@ import Manufacturers.Manufacturer;
 
 public class Product {
 
-    private final int _productID;
+    private int _productID, _manuID = -1; 
     private double _price, _rating, _productionCost;
     private String _description, _name;
     
@@ -25,7 +25,21 @@ public class Product {
         this._price = price;
         this._productionCost = productionCost;
         this._manufacturer = manufacturer;
+        this._manuID = manufacturer.getManufacturerID(); 
     }
+    
+    public Product(int productID, String name, double price, double productionCost, int manuID) {
+        this._productID = productID;
+        this._name = name;
+        this._price = price;
+        this._productionCost = productionCost;
+        //this._manufacturer = manufacturer;
+        this._manuID = manuID;
+        
+    }
+    
+    
+
 
     /**
      * Extended constructor for added functionality.
@@ -44,7 +58,23 @@ public class Product {
         this._description = description;
         this._rating = rating;
     }
+    
+    public Product(int productID, String name, double price, double productionCost, int manuID,
+            double rating, String description) {
+        this(productID, name, price, productionCost, manuID);
+        this._description = description;
+        this._rating = rating;
+    }
 
+    
+    
+    // generation auto code shit.
+    public int getManuID() {
+        return _manuID;
+    }
+
+    
+    
     // accessors
     public double getPrice() {
         return _price;

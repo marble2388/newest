@@ -5,6 +5,7 @@ package DB;
 import HRPackage.*;
 import IO.IO;
 import Manufacturers.Manufacturer;
+import Products.Product;
 import Session.Session;
 import java.sql.*;
 import java.util.ArrayList;
@@ -197,10 +198,17 @@ public class DBConnection {
                 //1, 'John', 'Smith', 'Male', 111111111, '11-04-05');
                 return inserts;
                 
-                //TABLE NAME: gc200325005.EMPLOYEE 
-                //STATEMENT: (EMPType, firstName, lastName, Gender, sin, Birthdate) VALUES (0'ben','dunn','male',123456789,'');
+
     }
 
+    //preps the insert statements for the product table.
+    public String prepInserIntoProduct (String name, double price, double productioncost, int manufacturerID, int rating, String description) 
+    {
+        String inserts = "(name, price, productionCost, manufacturerID, rating, description)"
+                + "Values ('" + name + "'," + price + "," + productioncost + "," + manufacturerID + "," + rating + ",'" + description +"');";
+      
+        return inserts;
+    }
 
     // insert new row to DB
     public void insertSQLDataBase(String TableName, String insertStatementValues) {
@@ -544,12 +552,13 @@ public class DBConnection {
                         +tempTable.getColumnCount());
                 buildManufacturerArray(tempTable);
                 return new ManufacturerIdentity(buildManufacturerArray(tempTable),tempTable );
-    }/*
+    }
+     /**
      * Queries the database and gets an encapsulated object with a table
      * and array of employees. 
      * @param prodTableQuery
      * @return 
-     
+     */
     public ProductIdentity getProductInformation (String prodTableQuery) {
         DefaultTableModel tempTable; //initialize place holder
                 tempTable = querySQLDataBase(prodTableQuery); //set variable
@@ -559,8 +568,8 @@ public class DBConnection {
                 buildProductArray(tempTable);
                 return new ProductIdentity(buildProductArray(tempTable),tempTable );    
     }
-    */
-    /**
+    
+    /* 
      * turns table into an array of employees
      * @param manuTable
      * 
@@ -590,38 +599,41 @@ public class DBConnection {
     }
     return manufacturers.toArray(new Manufacturer[manufacturers.size()]);
     }
-    /**
-     * turns table into an array of employees
-     * @param prodTable
-     * 
-     
-        public Product[] buildProductArray (DefaultTableModel prodTable) {
+    
+    public Product[] buildProductArray (DefaultTableModel prodtable) {
     ArrayList<Product> products = new ArrayList<Product>();
 
     int prodID = 0;
-    String prodName;
-    double prodCost;
-    double prodProductionCost;
-    Object prodManu;
+    String name ="";
+    double price = 0.00;
+    double productionCost = 0.00;
+    int manufacturerID = 0;
+    int rating = 0;
+    String description = "";
+    
+    
     try {
         
-        for (int i = 0; i<= prodTable.getRowCount()-1;i++)  {
-            prodID = Integer.parseInt(prodTable.getValueAt(i, 0).toString());
-            prodName = prodTable.getValueAt(i, 1).toString();
-            prodCost = Double.parseDouble(prodTable.getValueAt(i, 2).toString());
-            prodProductionCost = Double.parseDouble(prodTable.getValueAt(i, 3).toString());
-            prodManu = manufacturers.get(i);
-
-        
-            Product product = new Product(prodID,prodName,prodCost,prodProductionCost,manuArray);
-            products.add(product);
+        for (int i = 0; i<= prodtable.getRowCount()-1;i++)  {
+            prodID = Integer.parseInt(prodtable.getValueAt(i, 0).toString());
+            name = prodtable.getValueAt(i, 1).toString();
+            price = Double.parseDouble(prodtable.getValueAt(i, 2).toString());
+            productionCost = Double.parseDouble(prodtable.getValueAt(i, 3).toString());
+            manufacturerID = Integer.parseInt(prodtable.getValueAt(i, 4).toString());
+            rating = Integer.parseInt(prodtable.getValueAt(i, 5).toString());
+            description = prodtable.getValueAt(i, 6).toString();
+            
+            Product prod = new Product(prodID,name,price,productionCost,manufacturerID,rating,description );
+            products.add(prod);
         }
-
+       
     } catch (Exception e) {
         System.out.println(e);
     }
-    return products.toArray(new Product[products.size()]);
-}*/
+    return products.toArray(new Product[products.size()]);//return the arrayu. 
+    }
+    
 
+    
 
 }

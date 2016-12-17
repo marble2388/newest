@@ -97,7 +97,7 @@ public class GUI extends JFrame {
 
     // buttons
     private JButton createHourlyEmployeeBtn, createSalaryEmployeeBtn,
-            createCommEmployeeBtn, createProductBtn, searchEmployeeBtn,
+            createCommEmployeeBtn, createProductBtn,createManuBtn, searchEmployeeBtn,
             searchProductBtn, exitBtn;
     
     
@@ -201,7 +201,7 @@ public class GUI extends JFrame {
     private Manufacturer selectedManu;
     
     private ProductIdentity prodIdentity;
-    private Product[] proArray;
+    private Product[] prodStorage;
     private Product selectedProduct;
     
     //JPanel panel = new JPanel();
@@ -220,6 +220,8 @@ public class GUI extends JFrame {
     {"Commission Employee",
     "Hourly Employee",
     "Salary Employee"} );
+    private JComboBox manuComboBox = new JComboBox ();
+    private JComboBox prodComboBox = new JComboBox ();
     
     
     private int empCreateGetIndexofTabPane;
@@ -1296,8 +1298,8 @@ public class GUI extends JFrame {
             }
         }
         
-private JLabel manufacturerNameLbl,manufacturerCountryLbl, searchProductLbl,manuID,manuName,manuDesc,
-            manuCountry,prodID,prodShowID,prodName,prodCost,prodProductionCost,prodManu,prodSpacer;
+private JLabel manuID,manuName,manuNameDisp,manuDesc,manuCountry,prodID,prodShowID,prodName,prodCost,prodProductionCost,prodManu,prodSpacer;
+private String manuNames,prodNames;
     // text boxes for product tab
     private JTextField productNameTxt = new JTextField(15),
             productIDTxt = new JTextField(15),
@@ -1330,24 +1332,37 @@ private JLabel manufacturerNameLbl,manufacturerCountryLbl, searchProductLbl,manu
         // set border
         productPanel.setBorder(BorderFactory.createTitledBorder("Product basic info"));
         // set labels
-        prodID = new JLabel("Product ID:");
+        //prodID = new JLabel("Product ID:");
         prodName = new JLabel("Product name:");
         prodCost = new JLabel("Cost:");
         prodProductionCost = new JLabel("Production Cost:");
-        prodManu = new JLabel("Product Manufacturer:");
+        //prodManu = new JLabel("Product Manufacturer:");
         prodSpacer = new JLabel(" ");
-
+        DBConnection conn = new DBConnection();
+        this.prodIdentity = 
+                conn.getProductInformation("SELECT * FROM gc200325005.Products;");
+        
+        this.prodStorage = prodIdentity.getProdArrayReturn();
+        
+        for(int i = 0; i < prodStorage.length;i++) {
+           prodNames = prodStorage[i].getName();
+           prodComboBox.addItem(prodNames);
+        }
+        // create product button
+        createProductBtn = new JButton("Create Manufacturer");
+        createProductBtn.addActionListener(prodComboBox);
         // add everything to panel
-        productPanel.add(prodID);
-        productPanel.add(productIDTxt);
-        productPanel.add(prodCost);
-        productPanel.add(productPriceTxt);
+        //productPanel.add(prodID);
+        //productPanel.add(productIDTxt);
+        productPanel.add(prodComboBox);
         productPanel.add(prodName);
         productPanel.add(productNameTxt);
+        productPanel.add(prodCost);
+        productPanel.add(productPriceTxt);
         productPanel.add(prodProductionCost);
         productPanel.add(productPoductionCostTxt);
-        productPanel.add(prodManu);
-        productPanel.add(productManufacturerTxt);
+        //productPanel.add(prodManu);
+        //productPanel.add(productManufacturerTxt);
 
     }
 
@@ -1362,23 +1377,72 @@ private JLabel manufacturerNameLbl,manufacturerCountryLbl, searchProductLbl,manu
         manufacturerPanel.setBorder(BorderFactory.createTitledBorder("Manufacturer info"));
         // set labels
         manuName = new JLabel("Select a Manufacturer");
+        manuNameDisp = new JLabel("Name");
+        manuDesc = new JLabel("Description");
+        manuCountry = new JLabel("Country");
         //setup manufacturer list
         DBConnection conn = new DBConnection();
         this.manuIdenity = 
                 conn.getManufacturerInformation("SELECT * FROM gc200325005.Manufacturers;");
         
-        // create product button
-        createProductBtn = new JButton("Create product");
-
+        this.manuStorage = manuIdenity.getManuArrayReturn();
+        
+        for(int i = 0; i < manuStorage.length;i++) {
+           manuNames = manuStorage[i].getName();
+           manuComboBox.addItem(manuNames);
+        }
+        // create manufacturer button
+        createManuBtn = new JButton("Create Manufacturer");
+        manuComboBox.addActionListener(new comboBoxListener());
         // add everything to panel
         manufacturerPanel.add(manuName);
         manufacturerPanel.add(manuComboBox);
-        manufacturerPanel.add(createProductBtn);
+        manufacturerPanel.add(manuNameDisp);
+        manufacturerPanel.add(manuCountry);
+        manufacturerPanel.add(manuDesc);
+        manufacturerPanel.add(createManuBtn);
 
     }
+    
+    private int manuSelectedID; 
+    
+    private class comboBoxListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent event) {
+                   manuSelectedID = manuComboBox.getSelectedIndex();
+                }
+        }
+    private class submitProductButton implements ActionListener {
 
-       
-
-
+        @Override
+        public void actionPerformed(ActionEvent event) {
+            
+        }
+    }
+    
+    private void SubmitProduct () {
+        if(SubmitProductTestValues()) {
+  
+            DBConnection conn = new DBConnection();
+            String insert = conn.prepInserIntoProduct(this.productNameTxt.getText(), Double.parseDouble(this.productPriceTxt.getText()), 
+                    Double.parseDouble(this.productPoductionCostTxt.getText()),3 , 3, "");//this.manuSelectID
+            conn.insertSQLDataBase("gc200325005.Products", insert);
+            
+        } else {
+            JOptionPane.showMessageDialog(null, "Error, one of the fields in submitting a product is invalid");
+        }
+        
+    }
+    
+    private boolean SubmitProductTestValues () {
+        if (this.tryDoubleInt(this.productPriceTxt.getText())
+                &&(this.tryDoubleInt(this.productPoductionCostTxt.getText()))
+                &&(!this.productNameTxt.getText().equals(""))) { 
+            return true;
+        }
+        
+        return false;
+    }
+    
     
 }
